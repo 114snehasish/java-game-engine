@@ -1,4 +1,4 @@
-**Demo Game Engine using JAVA AWT :video_game**
+**Demo Game Engine using JAVA AWT :video_game:**
 -
 This provides a baseline framework to demonstrate how
 a complex game engine could be made using JAVA without
