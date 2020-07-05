@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Random;
 
 /**
  * This class is the main class containing the required game loop. It extends Canvas because it defines the main
@@ -20,7 +21,7 @@ import java.awt.image.DataBufferInt;
 public class Game extends Canvas implements Runnable {
 
     //define sie and scale of our game window
-    public static final double WIDTH = 300;                         //width of our game window
+    public static final double WIDTH = 400;                         //width of our game window
     public static final double ASPECT_RATIO = 16.0 / 9.0;           //the aspect ratio of our game window
     public static final double HEIGHT = WIDTH / ASPECT_RATIO;       //automatically calculate height based on width and aspect ratio
     public static final int SCALE = 3;                              //scale of our game
@@ -30,6 +31,7 @@ public class Game extends Canvas implements Runnable {
     private JFrame gameFrame;                                       //frame that will contain the game window
     private boolean isRunning = false;                              //controls the game's state [running or stopped]
     private int renderChoice = 2;                                   //the choice user has selected. Default to 2[Static TV] in case of invalid choice
+    private int randomColor = 0;                                    //the random color that will be shown in case user selects 1
     private ScreenRenderer screenRenderer;                          //Custom renderer. replace with your own class for further experiment/enhancement
     private BufferedImage image = new BufferedImage((int) WIDTH,    //Final image that rendered and displayed
             (int) HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -55,6 +57,10 @@ public class Game extends Canvas implements Runnable {
     //method that starts the game
     public synchronized void start(int choice) {
         renderChoice = choice;
+        if (choice == 1) {
+            Random random = new Random();
+            randomColor = random.nextInt(0xffffff + 1);
+        }
         isRunning = true;
         gameThread = new Thread(this, "Game");
         gameThread.start();
@@ -72,10 +78,32 @@ public class Game extends Canvas implements Runnable {
 
     @Override
     public void run() {
+        long lastTime = System.nanoTime();                              //Current system time. This is the time to contol the frequency of update()
+        long timer = System.currentTimeMillis();                        //current system time. this is for fps and update counter.
+
+        final double nanoSeconds = 1000000000.0 / 60.0;                 //to limit update calls to 60 Hz. It is number of nanoseconds in 16ms.
+        double delta = 0;
+        int frames = 0;
+        int updates = 0;
         while (isRunning) {
-            update();                                                   //Update the game logic
+            long now = System.nanoTime();
+            delta += (now - lastTime) / nanoSeconds;
+            lastTime = now;                                             //Reset the timer
+            if (delta >= 1) {                                           //to limit update calls to 60 Hz
+                update();                                               //Update the game logic
+                updates++;
+                delta--;
+            }
             render();                                                   //Render the game in the screen
+            frames++;
+            if (System.currentTimeMillis() - timer >= 1000) {           //if 1 second has passed, record the FPS and update counter
+                timer += 1000;
+                System.out.println("UPS: " + updates);
+                System.out.println("FPS: " + frames);
+                updates = frames = 0;
+            }
         }
+        stop();
     }
 
     //execute the game logic. this will be limited to 60 times a second
@@ -97,9 +125,9 @@ public class Game extends Canvas implements Runnable {
 
         //*************ACTUAL GRAPHICS STAFFS STARTS*****************//
         screenRenderer.clear();
-        if (renderChoice == 1)
-            screenRenderer.renderRandomColor();
-        else if (renderChoice == 2)
+        if (renderChoice == 1) {
+            screenRenderer.renderRandomColor(randomColor);
+        } else if (renderChoice == 2)
             screenRenderer.renderStaticSignal();
         else if (renderChoice == 3)
             screenRenderer.renderBouncyPixel();

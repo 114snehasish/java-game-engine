@@ -111,8 +111,7 @@ public class ScreenRenderer {
     }
 
     //render a random color
-    public void renderRandomColor() {
-        int randomColor=randomColor();
+    public void renderRandomColor(int randomColor) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 pixels[x + y * width] = randomColor;
