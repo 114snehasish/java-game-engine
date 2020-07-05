@@ -83,8 +83,8 @@ public class Game extends Canvas implements Runnable {
 
         final double nanoSeconds = 1000000000.0 / 60.0;                 //to limit update calls to 60 Hz. It is number of nanoseconds in 16ms.
         double delta = 0;
-        int frames = 0;
-        int updates = 0;
+        int frames = 0;                                                 //FPS counter
+        int updates = 0;                                                //Updates counter
         while (isRunning) {
             long now = System.nanoTime();
             delta += (now - lastTime) / nanoSeconds;
@@ -100,7 +100,7 @@ public class Game extends Canvas implements Runnable {
                 timer += 1000;
                 System.out.println("UPS: " + updates);
                 System.out.println("FPS: " + frames);
-                updates = frames = 0;
+                updates = frames = 0;                                   //Reset the counter
             }
         }
         stop();
