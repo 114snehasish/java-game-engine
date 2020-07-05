@@ -26,6 +26,8 @@ public class Game extends Canvas implements Runnable {
     public static final double HEIGHT = WIDTH / ASPECT_RATIO;       //automatically calculate height based on width and aspect ratio
     public static final int SCALE = 3;                              //scale of our game
 
+    public static final String TITLE = "The Game";                  //Game's title
+
     //define the game specific objects
     private Thread gameThread;                                      //the main thread which drives the game loop
     private JFrame gameFrame;                                       //frame that will contain the game window
@@ -46,7 +48,7 @@ public class Game extends Canvas implements Runnable {
         screenRenderer = new ScreenRenderer((int) WIDTH, (int) HEIGHT);
         gameFrame = new JFrame();
         gameFrame.setResizable(false);
-        gameFrame.setTitle("The Game");
+        gameFrame.setTitle(TITLE);
         gameFrame.add(this);                                        //Add the Canvas we just configured to the frame
         gameFrame.pack();                                           //pack the frame with the Canvas
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -98,8 +100,7 @@ public class Game extends Canvas implements Runnable {
             frames++;
             if (System.currentTimeMillis() - timer >= 1000) {           //if 1 second has passed, record the FPS and update counter
                 timer += 1000;
-                System.out.println("UPS: " + updates);
-                System.out.println("FPS: " + frames);
+                gameFrame.setTitle(TITLE + "  |  " + "UPS: " + updates + " | " + "FPS: " + frames);
                 updates = frames = 0;                                   //Reset the counter
             }
         }
